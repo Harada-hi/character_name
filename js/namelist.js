@@ -1,0 +1,315 @@
+import { nameDate } from "./namedate.js"
+
+Vue.createApp({
+
+})
+.component('tab-change',{
+    template:`<div class="top">
+        <h1>呼称確認ツール</h1>
+        <rule-modal />
+    <div class="tab">
+    <button  class="change" v-on:click="onclick('two')" v-bind:class="{ari}">対象指定あり</button>
+    <button  class="change" v-on:click="onclick('one')" v-bind:class="{nashi}">対象指定なし</button>
+    </div>
+</div>
+    <keep-alive>
+      <component v-bind:is="currentTab"></component>
+    </keep-alive>`,
+    methods:{
+        onclick(tab){
+            this.components = tab
+            if (tab === "two") {
+                this.ari = true
+                this.nashi = false
+            } else {
+                this.ari = false
+                this.nashi = true
+            }
+        }
+    },
+    computed:{
+        currentTab(){
+            return 'form-' + this.components
+        }
+    }
+    ,
+        data(){
+            return{
+            components:'two',
+            ari: true,
+            nashi: false
+            }
+        }
+
+
+})
+    .component('form-two', {
+        template: `<div class="person_choice">
+
+            <h3>出典絞り込み</h3>
+            <form>
+                <select class="data_sort" v-on:change="change" v-model="datasort">
+                    <option value="">条件なし</option>
+                    <option value="comic">漫画</option>
+                    <option value="anime">アニメ</option>
+                </select>
+            </form>
+            <h3>キャラ指定</h3>
+            <div class="flexarea">
+                <div class="innner_block">
+                    <form>
+                        <select class="person_selectA" v-on:change="change" v-model="selectA">
+                            <option value=""></option>
+                            <option value="aiueo">あいうえお太郎</option>
+                            <option value="kakikukeko">かきこけこ花子</option>
+                            <option value="dog">犬</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="innner_block center">
+                    <p>から</p>
+                </div>
+                <div class="innner_block">
+                    <form>
+                        <select class="person_selectB" v-on:change="change" v-model="selectB">
+                            <option value=""></option>
+                            <option value="aiueo">あいうえお太郎</option>
+                            <option value="kakikukeko">かきこけこ花子</option>
+                            <option value="dog">犬</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <person-two />`,
+        provide(){
+            return{
+                list: Vue.computed(()=>this.list)
+            }
+        },
+        computed: {
+            change(){
+
+                let dataOut = []
+
+                //プルダウンが両方選択状態かつ、不一致である時のみ実行する
+                if(this.selectA != false && this.selectB != false && this.selectA != this.selectB ){
+                const select_left = this.selectA
+                const select_right = this.selectB
+                const check_C = this.datasort
+
+                //インポートしたファイルから、呼ぶ側の名前と一致する配列を取得する
+                const name_call = nameDate[select_left]
+                
+
+                //呼ぶ側の名前の配列から、呼ぶ先の名前と一致するオブジェクトを取得する
+                let name_B = 0
+
+                for (let i = 0; i < name_call.length; i++) {
+                    if (Object.hasOwn(name_call[i],select_right)) {
+                        name_B = name_call[i]
+                    }
+                }
+                
+                //上記で取得したオブジェクトから、呼ぶ先の名前と一致する配列を取得する
+                const name_C = name_B[select_right]
+                
+
+                const dataAction = name_C.concat()
+
+                //絞り込み条件に応じて内容を変更する
+                for (let i =0; i <dataAction.length;i++){
+                    //選択内容がなければそのまま
+                    if (check_C == false){
+                        dataOut = dataAction.concat()
+                    } else {
+                        //イベント・サポート・初星の場合はfiltが一致するものだけを配列に追加する
+                        if (dataAction[i].filt === check_C) {
+                            dataOut.push(dataAction[i])
+                        }
+                    }
+                }} else {
+                    dataOut = []
+                }
+                
+
+                this.list = dataOut
+            }
+    
+        },
+        data(){
+            return {
+            selectA: '',
+            selectB: '',
+            datasort:'',
+            list:''
+            }
+        }
+    })
+    .component('form-one', {
+        template: `<div class="person_choice">
+
+        <h3>出典絞り込み</h3>
+            <form>
+                <select class="data_sort" v-on:change="change" v-model="datasort">
+                    <option value="">条件なし</option>
+                    <option value="comic">漫画</option>
+                    <option value="anime">アニメ</option>
+                </select>
+            </form>
+            <h3>キャラ指定</h3>
+            <div class="flexarea solo">
+                <div class="innner_block">
+                    <form>
+                        <select class="person_selectA" v-on:change="change" v-model="selectA">
+                            <option value=""></option>
+                            <option value="aiueo">あいうえお太郎</option>
+                            <option value="kakikukeko">かきこけこ花子</option>
+                            <option value="dog">犬</option>
+                        </select>
+                    </form>
+                </div>
+                
+                
+            </div>
+        </div>
+        <person-one />`,
+        provide(){
+            return{
+                list: Vue.computed(()=>this.list)
+            }
+        },
+        computed: {
+            change(){
+                let dataOut = []
+    
+                //プルダウンが両方選択状態かつ、不一致である時のみ実行する
+                if(this.selectA != false){
+                const select_left = this.selectA
+                const check_C = this.datasort
+    
+                //インポートしたファイルから、呼ぶ側の名前と一致する配列を取得する
+                const name_call = nameDate[select_left]
+                
+    
+    
+    
+                //呼ぶ側の名前の配列から、各大賞の配列をぜんぶやる
+                let allName = []
+                for (let i = 0; i < name_call.length; i++) {
+                    
+                    const nametest = Object.values(name_call[i]).reduce((previous,current)=>{
+                        return previous.concat(current)
+                    })
+
+                    
+                    allName.push(nametest)
+                   
+                }
+                
+                //上記で取得したオブジェクトから、呼ぶ先の名前と一致する配列を取得する
+                
+
+    
+                const dataAction = allName.reduce((previous,current)=>{
+                    return previous.concat(current)
+                })
+
+               
+    
+                //絞り込み条件に応じて内容を変更する
+                for (let i =0; i <dataAction.length;i++){
+                    //選択内容がなければそのまま
+                    if (check_C == false){
+                        dataOut = dataAction.concat()
+                    } else {
+                        //イベント・サポート・初星の場合はfiltが一致するものだけを配列に追加する
+                        if (dataAction[i].filt === check_C) {
+                            dataOut.push(dataAction[i])
+                        }
+                    }
+                    
+                }} else {
+                    dataOut = []
+                }
+                
+    
+                this.list = dataOut
+            }
+    
+        },
+        data(){
+            return {
+            selectA: '',
+            datasort:'',
+            list:''
+            }
+        }
+    })
+    .component('person-two',{
+        inject:['list'],
+        template:`<div class="person_name">
+            <table>
+                <tr>
+                    <th>呼称</th>
+                    <th>出典</th>
+                </tr>
+                <tr  v-for="item in list">
+                    <td>{{item.name}}</td>
+                    <td>{{item.data}}</td>
+                </tr>
+            </table>
+
+        </div>
+        `
+    })
+    .component('person-one',{
+        inject:['list'],
+        template:`<div class="person_name">
+            <table>
+                <tr>
+                    <th>対象</th>
+                    <th>呼称</th>
+                    <th>出典</th>
+                </tr>
+                <tr  v-for="item in list">
+                    <td>{{item.to}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.data}}</td>
+                </tr>
+            </table>
+
+        </div>
+        `
+    })
+    .component('rule-modal',{
+        template:`
+        <button class="menu" v-on:click="modalshow = true">使い方・更新履歴</button>
+        <div class="modal_out" v-show="modalshow">
+    <div class="modal_in">
+        <button v-on:click="modalshow = false"><img src="img/close.png
+" class="img"></button>
+        <div class="modal_txt">
+            <h2>使い方</h2>
+            <h3>対象指定あり</h3>
+            <p>左側で指定した人物の、右側で指定した人物に対する呼称を出典別に表示します。</p>
+            <h3>対象指定なし</h3>
+            <p>指定した人物の、他の人物に対する呼称全てを出典別に表示します。</p>
+            <h3>出典絞り込み</h3>
+            <p>漫画・アニメの出典ごとに絞り込んで表示が可能です。</p>
+        </div>
+        
+       
+        
+        
+    </div>
+</div>`,
+        data() {
+            return {
+                modalshow: true,
+            }
+        }
+    })
+    .mount('.app')
+
+    
